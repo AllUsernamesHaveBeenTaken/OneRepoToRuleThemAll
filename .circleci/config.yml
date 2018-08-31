@@ -2,20 +2,12 @@ version: 2
 
 jobs:
   build:
-    docker:
-      - image: docker:17.03.0-ce
     working_directory: /OneRepo
     branches:
       only:
         - master
         - devlop
     steps:
-      - setup_remote_docker
-      - run:
-          name: Show Info
-          command: |
-            docker version
-            docker info
       - checkout
       - run:
           name: Update Submodules
@@ -25,30 +17,16 @@ jobs:
             git submodule init
             git submodule update --remote
       - run:
-          name: Build the current image
+          name: Install NPM packages
           command: |
-            TAG=build
-            docker build -f Dockerfile -t ritsse/onerepo:$TAG .
+            npm install
+      - run:
+          name: Build Project
+          command: |
+            npm run build
       - run:
           name: Distribute
           command: |
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then
-                TAG=2.0.$CIRCLE_BUILD_NUM
-                docker tag ritsse/onerepo:build ritsse/onerepo:latest
-                docker tag ritsse/onerepo:build ritsse/onerepo:$TAG
-                docker push ritsse/onerepo:$TAG
-                docker push ritsse/onerepo:latest
-                JOB=deploy
-            fi
-            if [ "${CIRCLE_BRANCH}" == "devlop" ]; then
-                TAG=dev-2.0.$CIRCLE_BUILD_NUM
-                docker tag ritsse/onerepo:build ritsse/onerepo:dev-latest
-                docker tag ritsse/onerepo:build ritsse/onerepo:$TAG
-                docker push ritsse/onerepo:$TAG
-                docker push ritsse/onerepo:dev-latest
-                JOB=dev_deploy
-            fi;
             curl --user ${CIRCLE_API_TOKEN}: \
                 --data build_parameters[CIRCLE_JOB]=$JOB \
                 --data build_parameters[BUILD_TAG]=$TAG\
@@ -63,7 +41,7 @@ jobs:
       - add_ssh_keys
       - deploy:
           command: |
-            ssh deployer@eggs.se.rit.edu docker service update --image=ritsse/onerepo:$BUILD_TAG sse_dev_dev_web --detach=false
+            scp -r /home/circleci/repo/OneRepo deployer@STAGING
 
   deploy:
     machine: true
