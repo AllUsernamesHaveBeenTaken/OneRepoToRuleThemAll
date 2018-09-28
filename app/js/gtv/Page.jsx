@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { TorqueSlides, TorqueSlide } from 'torque-react';
+import TorqueSlides from 'torque-react';
 import { getEvents } from 'events/actions';
 import ColorView from 'gtv/components/ColorView';
 import EventPanels from 'gtv/containers/EventPanels';
@@ -49,25 +49,18 @@ class GTV extends Component {
 
   render() {
     return (
-      <div className="gtv" >
-        <TorqueSlides duration={30} keyboardInteractive >
-          <TorqueSlide>
-            <EventPanels />
-          </TorqueSlide>
-          <TorqueSlide duration={5}>
-            <ColorView color="white" />
-          </TorqueSlide>
-          <TorqueSlide duration={15}>
-            <EventHighlight />
-          </TorqueSlide>
-          <TorqueSlide>
-            <ThreeWeek />
-          </TorqueSlide>
-          <TorqueSlide duration={5}>
-            <ColorView color="black" />
-          </TorqueSlide>
-        </TorqueSlides>
-      </div>
+    <TorqueSlides duration={2} keyboardInteractive={true} >
+        <p>Wow!</p>
+        <EventPanels />
+        <ColorView color="white" />
+        <EventHighlight />
+        <ThreeWeek />
+        <ColorView color="black" />
+        <p>My Cool</p>
+        <p>Unstyled</p>
+        <p>Torque slides!</p>
+    </TorqueSlides>
+
     );
   }
 }
